@@ -171,7 +171,7 @@ function imediaelement_field_formatter_info() {
  */
 function imediaelement_field_formatter_view($entity_type, $entity, array $field, array $instance, $langcode, array $items, array $display) {
   // A unique caller per page for the JS specific settings to use. This may be
-  // different for ever page view and should not be used for styling.
+  // different for every page view and should not be used for styling.
   static $id = 0;
   $settings = $display['settings'];
   $element = array();
@@ -209,6 +209,7 @@ function imediaelement_field_formatter_view($entity_type, $entity, array $field,
         variable_get('imediaelement_ctrl_volume') == TRUE ? 'volume' : NULL,
       );
     }
+    
     if ($display['type'] == 'imediaelement_video') {
       $js_settings['opts']['videoWidth'] = (int) $settings['appearance']['width'];
       $js_settings['opts']['videoHeight'] = (int) $settings['appearance']['height'];
