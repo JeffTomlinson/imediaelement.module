@@ -66,6 +66,16 @@ function imediaelement_init() {
 }
 
 /**
+ * Implements hook_file_mimetype_mapping_alter().
+ *
+ * @param array $mapping
+ */
+function imediaelement_file_mimetype_mapping_alter(&$mapping) {
+  $mapping['mimetypes'][] = 'video/vimeo';
+  $mapping['mimetypes'][] = 'video/youtube';
+}
+
+/**
  * Get default attributes for currently selected skin.
  *
  * @param string $setting
@@ -169,7 +179,7 @@ function imediaelement_field_formatter_info() {
  *
  * @return array
  */
-function imediaelement_field_formatter_view($entity_type, $entity, array $field, array $instance, $langcode, array $items, array $display) {
+function imediaelement_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   // A unique caller per page for the JS specific settings to use. This may be
   // different for every page view and should not be used for styling.
   static $id = 0;
@@ -221,6 +231,9 @@ function imediaelement_field_formatter_view($entity_type, $entity, array $field,
         variable_get('imediaelement_ctrl_duration') == TRUE ? 'duration' : NULL,
         variable_get('imediaelement_ctrl_fullscreen') == TRUE ? 'fullscreen' : NULL,
       );
+
+      // Mabye just map settings ?:
+// array_map('variable_get', array_keys($settings), array_values($settings));
     }
 
     $class = 'mediaelement-formatter-identifier-' . time() . '-' . $id++;
@@ -297,7 +310,7 @@ function imediaelement_theme() {
  * @return string
  *   Formatted html.
  */
-function theme_imediaelement_audio(array $variables) {
+function theme_imediaelement_audio($variables) {
 
   return imediaelement_markup($variables, 'audio');
 }
@@ -310,7 +323,7 @@ function theme_imediaelement_audio(array $variables) {
  * @return string
  *   Formatted html.
  */
-function theme_imediaelement_video(array $variables) {
+function theme_imediaelement_video($variables) {
   $src = $variables['attributes']['src'];
   if (!strpos($src, $GLOBALS['base_url'])) {
     $provider = "";
@@ -338,7 +351,7 @@ function theme_imediaelement_video(array $variables) {
  *
  * @return string
  */
-function imediaelement_markup(array $variables, $type, $provider = NULL) {
+function imediaelement_markup($variables, $type, $provider = NULL) {
   $source = "";
   if ($provider) {
     $source = '<source type="' . "$type/$provider" . '" src="' . $variables['attributes']['src'] . '" />';
@@ -367,8 +380,9 @@ function imediaelement_markup(array $variables, $type, $provider = NULL) {
  * @param array $form_state
  * 
  * @return array
+ *   Settings form.
  */
-function imediaelement_field_formatter_settings_form(array $field, array $instance, $view_mode, array $form, array &$form_state) {
+function imediaelement_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
   $element = array();
@@ -467,7 +481,7 @@ function imediaelement_field_formatter_settings_form(array $field, array $instan
  * @return string
  *   Translated summary.
  */
-function imediaelement_field_formatter_settings_summary(array $field, array $instance, $view_mode) {
+function imediaelement_field_formatter_settings_summary($field, $instance, $view_mode) {
 
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
