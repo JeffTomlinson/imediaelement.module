@@ -71,8 +71,16 @@ function imediaelement_init() {
  * @param array $mapping
  */
 function imediaelement_file_mimetype_mapping_alter(&$mapping) {
-  $mapping['mimetypes'][] = 'video/vimeo';
-  $mapping['mimetypes'][] = 'video/youtube';
+  $nMap = array(
+    'video/vimeo',
+    'video/youtube'
+  );
+
+  foreach ($nMap as $key) {
+    if (empty($mapping[$key])) {
+      $mapping['mimetypes'][] = $key;
+    }
+  }
 }
 
 /**
@@ -213,13 +221,13 @@ function imediaelement_field_formatter_view($entity_type, $entity, $field, $inst
       $js_settings['opts']['audioHeight'] = (int) $settings['appearance']['height'];
       $js_settings['opts']['features'] = array(
         variable_get('imediaelement_ctrl_playpause') == TRUE ? 'playpause' : NULL,
+        variable_get('imediaelement_ctrl_volume') == TRUE ? 'volume' : NULL,
         variable_get('imediaelement_ctrl_current') == TRUE ? 'current' : NULL,
         variable_get('imediaelement_ctrl_progress') == TRUE ? 'progress' : NULL,
         variable_get('imediaelement_ctrl_duration') == TRUE ? 'duration' : NULL,
-        variable_get('imediaelement_ctrl_volume') == TRUE ? 'volume' : NULL,
       );
     }
-    
+
     if ($display['type'] == 'imediaelement_video') {
       $js_settings['opts']['videoWidth'] = (int) $settings['appearance']['width'];
       $js_settings['opts']['videoHeight'] = (int) $settings['appearance']['height'];
