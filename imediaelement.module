@@ -6,8 +6,6 @@
 
 /**
  * Implements hook_menu().
- *
- * @return array
  */
 function imediaelement_menu() {
   return array(
@@ -24,8 +22,6 @@ function imediaelement_menu() {
 
 /**
  * Implements hook_library().
- *
- * @return array
  */
 function imediaelement_library() {
   $libpath = libraries_get_path('imediaelement');
@@ -67,8 +63,6 @@ function imediaelement_init() {
 
 /**
  * Implements hook_file_mimetype_mapping_alter().
- *
- * @param array $mapping
  */
 function imediaelement_file_mimetype_mapping_alter(&$mapping) {
   $nMap = array(
@@ -87,8 +81,10 @@ function imediaelement_file_mimetype_mapping_alter(&$mapping) {
  * Get default attributes for currently selected skin.
  *
  * @param string $setting
+ *   The active mediaelement skin.
  * 
  * @return array
+ *   Default parameters assosciated with the selected player skin.
  */
 function imediaelement_controls($setting) {
   $lib = libraries_get_path('imediaelement');
@@ -99,16 +95,17 @@ function imediaelement_controls($setting) {
       $skin['height'] = '30';
       break;
 
-    case $lib . '/build/mediaelement_light.min.css':
-    case $lib . '/build/mediaelement_dark.min.css':
-      $skin['width'] = '240';
-      $skin['height'] = '32';
-      break;
-
     case $lib . '/build/mediaelement_large_light.min.css':
     case $lib . '/build/mediaelement_large_dark.min.css':
       $skin['width'] = '300';
       $skin['height'] = '48';
+      break;
+
+    case $lib . '/build/mediaelement_light.min.css':
+    case $lib . '/build/mediaelement_dark.min.css':
+    default:
+      $skin['width'] = '240';
+      $skin['height'] = '32';
       break;
   }
 
@@ -117,8 +114,6 @@ function imediaelement_controls($setting) {
 
 /**
  * Implements hook_field_formatter_info().
- *
- * @return array
  */
 function imediaelement_field_formatter_info() {
   $formatters = array();
@@ -175,17 +170,6 @@ function imediaelement_field_formatter_info() {
 
 /**
  * Implements hook_field_formatter_view().
- *
- * @staticvar int $id
- * @param string $entity_type
- * @param object $entity
- * @param array $field
- * @param array $instance
- * @param string $langcode
- * @param array $items
- * @param array $display
- *
- * @return array
  */
 function imediaelement_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   // A unique caller per page for the JS specific settings to use. This may be
@@ -239,9 +223,6 @@ function imediaelement_field_formatter_view($entity_type, $entity, $field, $inst
         variable_get('imediaelement_ctrl_duration') == TRUE ? 'duration' : NULL,
         variable_get('imediaelement_ctrl_fullscreen') == TRUE ? 'fullscreen' : NULL,
       );
-
-      // Mabye just map settings ?:
-// array_map('variable_get', array_keys($settings), array_values($settings));
     }
 
     $class = 'mediaelement-formatter-identifier-' . time() . '-' . $id++;
@@ -311,9 +292,10 @@ function imediaelement_theme() {
 }
 
 /**
- * Markup for Video
+ * Markup for Audio
  *
  * @param array $variables
+ *   Assosciative array of attributes & settings.
  *
  * @return string
  *   Formatted html.
@@ -327,6 +309,7 @@ function theme_imediaelement_audio($variables) {
  * Markup for Video
  *
  * @param array $variables
+ *   Assosciative array of attributes & settings.
  *
  * @return string
  *   Formatted html.
@@ -354,8 +337,11 @@ function theme_imediaelement_video($variables) {
  * Structure markup for mediaelement audio & video tags.
  *
  * @param array $variables
+ *   Assosciative array of attributes & settings.
  * @param string $type
+ *   HTML tag type, either audio or video.
  * @param string $provider
+ *   External media provider.
  *
  * @return string
  */
@@ -380,15 +366,6 @@ function imediaelement_markup($variables, $type, $provider = NULL) {
 
 /**
  * Implements hook_field_formatter_settings_form().
- * 
- * @param array $field
- * @param array $instance
- * @param string $view_mode
- * @param array $form
- * @param array $form_state
- * 
- * @return array
- *   Settings form.
  */
 function imediaelement_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
   $display = $instance['display'][$view_mode];
@@ -481,16 +458,8 @@ function imediaelement_field_formatter_settings_form($field, $instance, $view_mo
 
 /**
  * Implements hook_field_formatter_settings_summary().
- *
- * @param array $field
- * @param array $instance
- * @param string $view_mode
- *
- * @return string
- *   Translated summary.
  */
 function imediaelement_field_formatter_settings_summary($field, $instance, $view_mode) {
-
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
 
@@ -500,4 +469,24 @@ function imediaelement_field_formatter_settings_summary($field, $instance, $view
     '@width' => $settings['appearance']['width'],
     '@height' => $settings['appearance']['height'],
   ));
+}
+
+/**
+ * Implements hook_help().
+ */
+function imediaelement_help($path, $arg) {
+  if ($path === 'admin/help#imediaelement') {
+    $output = '';
+    $output .= '<p>' . t('The iMediaElement module provides support for playing nearly any audio &amp; video content from both the local filesystem and 3rd party providers like Youtube.') . '</p>';
+    $output .= '<h2>' . t('Configuration') . '</h2>';
+    $output .= '<ol>';
+    $output .= '<li>' . t('Download/git the <a href="@imediaelement">improved mediaelement library</a> and extract to $base_url/sites/$site/libraries/imediaelement', array('@imediaelement' => 'https://github.com/ablank/imediaelement')) . '</li>';
+    $output .= '<li>' . t('<a href="!globalsettings">Configure the global settings</a> - Select the player skin and sitewide use options that make you happy', array('!globalsettings' => '/admin/config/media/imediaelement')) . '</li>';
+    $output .= '<li>' . t('Add &amp; configure fields to your content type.') . '</li>';
+    // $output .= '<li>' . t() . '</li>';
+    $output .= '</ol>';
+    $output .= '<img alt="iMediaElement Field Settings" src="' . file_create_url(drupal_get_path('module', 'imediaelement') . '/admin/help_format.jpg') . '" width=440 height=380 />';
+
+    return $output;
+  }
 }
