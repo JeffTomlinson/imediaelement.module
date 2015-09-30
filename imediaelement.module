@@ -278,7 +278,9 @@ function imediaelement_field_formatter_view($entity_type, $entity, $field, $inst
       $element[$delta]['#attributes']['width'] = $settings['appearance']['width'];
 
       // Add the poster image.
-      if (($poster_field = $settings['poster']['poster_field']) && !empty($entity->{$poster_field})) {
+      if (isset($settings['poster']['poster_field'])
+        && ($poster_field = $settings['poster']['poster_field'])
+        && !empty($entity->{$poster_field})) {
         //if (!empty($entity->{$poster_field})) {
         $image = field_get_items($entity_type, $entity, $poster_field);
 
